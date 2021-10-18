@@ -80,6 +80,7 @@ public class UiController : MonoBehaviour
         }
     }
 
+
     public void ConvertCanvas(int canvasNum)
     {
         int beforeStack, currentStack;
@@ -113,6 +114,7 @@ public class UiController : MonoBehaviour
             GameManager.Instance.currentCanvasNum = canvasNum;
         }
 
+
         //카메라 제어
         if (stackCanvas[stackIndex] == 0)
         {
@@ -132,7 +134,6 @@ public class UiController : MonoBehaviour
             {
                 miniMapCamera.gameObject.SetActive(true);
             }
-
             else
             {
                 miniMapCamera.gameObject.SetActive(false);
@@ -142,37 +143,13 @@ public class UiController : MonoBehaviour
         Debug.Log(GameManager.Instance.currentCanvasNum);
     }
 
+
     //팝업 창 종료
     public void ClosePopUp(GameObject popUp)
     {
         popUp.SetActive(false);
     }
 
-    //터치 드래그한 좌표 길이
-    public void OnDragCamera()
-    {
-        int touchCount = Input.touchCount;
-
-        if (touchCount == 1)
-        {
-            if (prePos == Vector2.zero)
-            {
-                prePos = Input.GetTouch(0).position;
-                return;
-            }
-
-            Vector2 dir = (Input.GetTouch(0).position - prePos).normalized;
-            Vector3 vec = new Vector3(dir.x, 100, dir.y);
-
-            uiCamera.transform.position -= vec * 5 * Time.deltaTime;
-            prePos = Input.GetTouch(0).position;
-        }
-    }
-    
-    public void ExitDrag()
-    {
-        prePos = Vector2.zero;
-    }
 
     //Android Native
     //토스트 메시지 출력

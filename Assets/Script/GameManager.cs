@@ -33,13 +33,13 @@ public class GameManager : MonoBehaviour
 
         if (!Application.isEditor)
         {
-            while (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
-            // GPS 접근권한
-            if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+            // 카메라 및 위치 접근권한
+            while (!Permission.HasUserAuthorizedPermission(Permission.FineLocation)
+                    && !Permission.HasUserAuthorizedPermission(Permission.Camera))
+            {
                 Permission.RequestUserPermission(Permission.FineLocation);
-            // 카메라 접근권한
-            if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
                 Permission.RequestUserPermission(Permission.Camera);
+            }
         }
     }
 
