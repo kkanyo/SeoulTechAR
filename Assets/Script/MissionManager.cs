@@ -57,7 +57,7 @@ public class MissionManager : MonoBehaviour
     
     IEnumerator NavigateCoroutine()
     {
-        var wait = new WaitForSeconds(0.25f);
+        var wait = new WaitForSeconds(0.2f);
 
         string targetNum = GameManager.Instance.bdNumSelected;
 
@@ -206,6 +206,7 @@ public class MissionManager : MonoBehaviour
         isMissionClear[index] = true;
     }
 
+    //길 찾기 시작
     public void StartNavigate()
     {
         string targetNum = GameManager.Instance.bdNumSelected;
@@ -217,18 +218,21 @@ public class MissionManager : MonoBehaviour
 
         GameManager.Instance.isNavigate = true;
 
-        StartCoroutine("NavigateCoroutine");
+        StartCoroutine(NavigateCoroutine());
 
         Debug.Log("안내를 시작합니다.");
         uiController.DisplayAndroidToastMessage("안내를 시작합니다.");
     }
 
+    //길 찾기 종료
     public void EndNavigate()
     {
         cancelNaviBtn.SetActive(false);
         navigator.SetActive(false);
 
         GameManager.Instance.isNavigate = false;
+
+        StopCoroutine(NavigateCoroutine());
 
         Debug.Log("안내를 종료합니다.");
         uiController.DisplayAndroidToastMessage("안내를 종료합니다.");

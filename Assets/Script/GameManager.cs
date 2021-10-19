@@ -4,7 +4,6 @@ using UnityEngine.Android;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-//Unity Design Patterns - Singleton
 public class GameManager : MonoBehaviour
 {
     #region Singleton
@@ -17,6 +16,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     public Image panel;
+    private bool checkPermission = false;
 
     private void Awake()
     {
@@ -33,20 +33,18 @@ public class GameManager : MonoBehaviour
 
         if (!Application.isEditor)
         {
-            // 카메라 및 위치 접근권한
-            while (!Permission.HasUserAuthorizedPermission(Permission.FineLocation)
-                    && !Permission.HasUserAuthorizedPermission(Permission.Camera))
-            {
-                Permission.RequestUserPermission(Permission.FineLocation);
-                Permission.RequestUserPermission(Permission.Camera);
-            }
+            StartCoroutine(PermissionCheckCoroutine());
+        }
+        else
+        {
+            StartCoroutine(FadeCoroutine());
         }
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(FadeCoroutine());
+        
     }
 
     // Update is called once per frame
@@ -67,6 +65,38 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
+    IEnumerator PermissionCheckCoroutine()
+    {
+        var waitFrame = new WaitForEndOfFrame();
+        var waitSec = new WaitForSeconds(0.2f);
+        var waitFocus = new WaitUntil(() => Application.isFocused == true);
+        
+        yield return waitFrame;
+
+        if (Permission.HasUserAuthorizedPermission(Permission.Camera) == false)
+        {
+            Permission.RequestUserPermission(Permission.Camera);
+
+            yield return waitSec;
+            yield return waitFocus;
+        }
+        
+        if (Permission.HasUserAuthorizedPermission(Permission.FineLocation) == false)
+        {
+            Permission.RequestUserPermission(Permission.FineLocation);
+
+            yield return waitSec;
+            yield return waitFocus;
+        }
+
+        if (SceneManager.GetActiveScene().name == "Start")
+        {
+            StartCoroutine(FadeCoroutine());
+        }
+    }
+        
+
     IEnumerator FadeCoroutine()
     {
         var wait = new WaitForSeconds(0.01f);
@@ -86,5 +116,6 @@ public class GameManager : MonoBehaviour
     public void MoveScene(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
+        StopCoroutine(FadeCoroutine());
     }
 }

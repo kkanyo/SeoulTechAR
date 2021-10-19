@@ -38,23 +38,10 @@ public class LocativeLabel : MonoBehaviour
     {
         if (FaceCamera)
         {
-            //transform.LookAt(Camera.main.transform);
-            //transform.rotation = Camera.main.transform.rotation
             transform.rotation = Quaternion.LookRotation(transform.position - Camera.main.transform.position);
         }
     }
 
-    /*
-    void LateUpdate()
-    {
-        if (FaceCamera)
-        {
-            //transform.LookAt(Camera.main.transform);
-            //transform.rotation = Camera.main.transform.rotation
-            transform.rotation = Quaternion.LookRotation(transform.position - Camera.main.transform.position);
-        }
-    }
-    */
 
     IEnumerator UpdateLocativeLabel()
     {

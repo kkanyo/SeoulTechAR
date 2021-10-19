@@ -15,15 +15,11 @@ public class LocativeTarget : MonoBehaviour
     public double longitude;
     public double altitude;
 
-    //[Header("Enable")]
-    //public float MaximumDistance=1000;
-
     private double  raioTerra = 6372797.560856f;
 
 
     private void Start()
     {
-        //print(raioTerra + " " + longitude);
 
     }
 
@@ -32,12 +28,7 @@ public class LocativeTarget : MonoBehaviour
     {
         Vector3 coord = calculaPosCoordCam();
         transform.position = coord;
-        //print(coord.x +" " + coord.y + " " + coord.z);
-
     }
-
-
-
 
 
     private Vector3 calculaPosCoordCam()
@@ -51,10 +42,9 @@ public class LocativeTarget : MonoBehaviour
             dlon = getCoordEmMetrosDeRaio(raioLat, dlon);
 
 
-        double dalt = altitude - 0.0f;// LocativeGPS.Instance.altitude; 
+        double dalt = altitude - 0.0f;
         return new Vector3((float)dlat, (float)dalt, -(float)dlon);
     }
-
 
 
     private double getCoordEmMetrosDeRaio(double raio, double angulo)
