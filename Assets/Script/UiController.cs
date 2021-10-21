@@ -7,7 +7,7 @@ public class UiController : MonoBehaviour
 {
     const int NUM_OF_CANVAS = 6;
 
-    UpdateInfo updateInfo;
+    private UpdateInfo updateInfo;
     
     //이전 화면을 저장하기 쉬한 스택
     private int[] stackCanvas = new int[NUM_OF_CANVAS];
@@ -18,12 +18,12 @@ public class UiController : MonoBehaviour
     //0: AR, 1: Info, 2: Map, 3: Mission, 4: Search 5: LarBg
     public Canvas[] canvasList;
     public CanvasGroup[] canvasGroupList;
-    public Camera uiCamera;
-    public Camera miniMapCamera;
-    public Camera larCamera;
+    //0: UI, 1: Minimap, 2: Lar
+    public Camera[] cameraList;
+    public GameObject buildings;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         updateInfo = new UpdateInfo();
 
@@ -42,11 +42,12 @@ public class UiController : MonoBehaviour
     }
     
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         //Raycast를 이용하여 오브젝트와 충돌 감지
         if (Input.GetMouseButtonDown(0))
         {
+            Debug.Log(EventSystem.current.currentSelectedGameObject);
             tempRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         }
         if (Input.GetMouseButtonUp(0))
@@ -60,9 +61,10 @@ public class UiController : MonoBehaviour
             //클릭하고 벗어나거나 클릭된 상태로 들어왔을 때 실행되는 것을 방지
             if (Physics.Raycast(tempRay, out upHit) && upHit.Equals(downHit))
             {
+                int currentCanvasNum = GameManager.Instance.currentCanvasNum;
                 //AR화면에서는 ARTag만 Map화면에서는 MapTag의 오브젝트만 충돌
-                if (upHit.collider.gameObject.tag == "ARTag" && canvasList[0].enabled == true
-                    || upHit.collider.gameObject.tag == "MapTag" && canvasList[2].enabled == true)
+                if ((upHit.collider.gameObject.tag == "ARTag" && currentCanvasNum == 0)
+                    || (upHit.collider.gameObject.tag == "MapTag" && currentCanvasNum == 2))
                 {
                     GameManager.Instance.bdNumSelected = upHit.collider.gameObject.name.Split('_')[0];
                     //Info화면으로 전환
@@ -77,6 +79,12 @@ public class UiController : MonoBehaviour
             {
                 GameManager.Instance.bdNumSelected = tempObj.name;   
             }
+        }
+        
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            if (Input.GetKey(KeyCode.Escape))
+                ConvertCanvas(-1);
         }
     }
 
@@ -121,26 +129,28 @@ public class UiController : MonoBehaviour
             //AR 화면으로 이동 시 캔버스 스택 초기화
             stackIndex = 0;
 
-            uiCamera.gameObject.SetActive(false);
-            miniMapCamera.gameObject.SetActive(true);
-            larCamera.gameObject.SetActive(true);
+            buildings.SetActive(true);
+
+            cameraList[0].gameObject.SetActive(false);
+            cameraList[1].gameObject.SetActive(true);
+            cameraList[2].gameObject.SetActive(true);
         }
         else
         {
-            uiCamera.gameObject.SetActive(true);
-            larCamera.gameObject.SetActive(false);
+            cameraList[0].gameObject.SetActive(true);
+            cameraList[2].gameObject.SetActive(false);
 
-            if (canvasNum == 2)
+            if (stackCanvas[stackIndex] == 2)
             {
-                miniMapCamera.gameObject.SetActive(true);
+                buildings.SetActive(true);
+                cameraList[1].gameObject.SetActive(true);
             }
             else
             {
-                miniMapCamera.gameObject.SetActive(false);
+                buildings.SetActive(false);
+                cameraList[1].gameObject.SetActive(false);
             }
         }
-
-        Debug.Log(GameManager.Instance.currentCanvasNum);
     }
 
 

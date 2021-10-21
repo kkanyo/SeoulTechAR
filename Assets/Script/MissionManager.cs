@@ -5,8 +5,7 @@ using UnityEngine.UI;
 
 public class MissionManager : MonoBehaviour
 {
-    private string mDatabaseFileName = "BuildingInfo.db";
-    private DatabaseManager mDatabaseManager;
+    const int NUM_OF_MISSIONS = 6;
     private UiController uiController;
     
     #region forMission
@@ -15,13 +14,13 @@ public class MissionManager : MonoBehaviour
     private string userMajorOffice;
     private string[] gradeList;
     private int levelCount;
-    public TMPro.TMP_InputField myMajor;
-    public GameObject buildingMsn3;
-    public Text buildingNameMsn3;
-    public Image[] missionList;
+    private Text gradeText;
+    private TMPro.TMP_InputField myMajor;
+    private GameObject buildingMsn3;
+    private Text buildingNameMsn3;
+    private Image[] missionList;
     public GameObject buildingList;
     public GameObject completePopUp;
-    public Text gradeText;
     #endregion
 
     #region forNavigate
@@ -31,10 +30,23 @@ public class MissionManager : MonoBehaviour
     public GameObject navigator;
     #endregion
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        mDatabaseManager = new DatabaseManager(mDatabaseFileName);
+        Transform temp = transform.Find("Scroll View").Find("Viewport").Find("MissionList");
+
+        gradeText = transform.Find("GradeText").Find("Text").GetComponent<Text>();
+        myMajor = transform.Find("MajorInput").GetComponent<TMPro.TMP_InputField>();
+        buildingMsn3 = temp.GetChild(2).Find("00").gameObject;
+        buildingNameMsn3 = buildingMsn3.transform.Find("NameText").GetComponent<Text>();
+        missionList = new Image[] {
+            temp.GetChild(0).GetComponent<Image>(),
+            temp.GetChild(1).GetComponent<Image>(),
+            temp.GetChild(2).GetComponent<Image>(),
+            temp.GetChild(3).GetComponent<Image>(),
+            temp.GetChild(4).GetComponent<Image>(),
+            temp.GetChild(5).GetComponent<Image>()
+        };
+
         uiController = new UiController();
 
         isMissionCheck = false;
@@ -42,22 +54,16 @@ public class MissionManager : MonoBehaviour
         gradeList = new string[] { "Lv1. 갓난내기", "Lv2. 새내기", "Lv3. 밥값내기", "Lv4. 헌내기" };
         gradeText.text = gradeList[0];
         levelCount = 0;
-
+        buildingMsn3.GetComponent<Button>().enabled = false;
+    
         cancelNaviBtn.SetActive(false);
         navigator.SetActive(false);
-
-        StartCoroutine("NavigateCoroutine");
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
     
+    //길 찾기 코루틴
     IEnumerator NavigateCoroutine()
     {
-        var wait = new WaitForSeconds(0.2f);
+        var wait = new WaitForEndOfFrame();
 
         string targetNum = GameManager.Instance.bdNumSelected;
 
@@ -75,7 +81,7 @@ public class MissionManager : MonoBehaviour
 
             navigator.transform.LookAt(targetPosition);
 
-            //목적지가 미션 건물이고 가까워지면 미션 성공
+            //목적지가 미션 건물이고 목적지와 가까워지면 미션 성공
             if (dist < 30)
             {
                 if (isMissionCheck)
@@ -105,58 +111,53 @@ public class MissionManager : MonoBehaviour
     //사용자의 학과 설정
     public void SetMyMajor()
     {
-        SqliteDataReader tempSql = mDatabaseManager.SelectWhere("Major", null,
+        DatabaseManager databaseManager = GameManager.Instance.databaseManager;
+
+        SqliteDataReader tempSql = databaseManager.SelectWhere("Major", null,
             new string[] { "BuildingNumber" },
             new string[] { "MajorName" },
             new string[] { " LIKE " },
             new string[] { "%" + myMajor.text + "%" },
             null, null );
 
-        //Save the data in advance
         userMajorOffice = tempSql[0].ToString();
 
         int rowCount = 0;
 
-        //count number of rows
         while (tempSql.Read())
         {
             rowCount++;
         }
         
-        //If multiple search results appear, re-request the search.
+        //입력 학과명이 옳바르지 않은 경우 예외 처리
         if (rowCount != 1)
         {
-            //Delete dump data
             userMajorOffice = null;
 
-            Debug.Log("잘못된 입력입니다.");
-            
-            //Display toast message
-                uiController.DisplayAndroidToastMessage("잘못된 입력입니다.");
+            //토스트 메세지 출력
+            uiController.DisplayAndroidToastMessage("잘못된 입력입니다.");
         }
         else
         {
-            tempSql = mDatabaseManager.SelectWhere("Buildings", null,
+            tempSql = databaseManager.SelectWhere("Buildings", null,
                 new string[] { "BuildingName" },
                 new string[] { "BuildingNumber" },
                 new string[] { "=" },
                 new string[] { userMajorOffice },
                 null, null );
 
-            //update destination data of mission3 
+            //미션3의 데이터 변경
             buildingMsn3.name = userMajorOffice;
+            buildingMsn3.GetComponent<Button>().enabled = true;
             buildingNameMsn3.text = tempSql[0].ToString();
+            
         }
 
         tempSql.Close();
     }
 
-    public void MissionCheck()
-    {
-        isMissionCheck = true;
-    }
-
-    public void MissionClear(string targetNum)
+    //완료된 미션 판단
+    private void MissionClear(string targetNum)
     {
         switch (targetNum)
         {
@@ -187,9 +188,10 @@ public class MissionManager : MonoBehaviour
         }
     }
 
-    //If complete a mission, update UI of the mission list
-    public void UpdateMissionUI(int index)
+    //완료된 미션의 UI 변경
+    private void UpdateMissionUI(int index)
     {
+        Debug.Log("성공");
         completePopUp.SetActive(true);
 
         gradeText.text = gradeList[(++levelCount)/2];
@@ -204,6 +206,12 @@ public class MissionManager : MonoBehaviour
         }
         
         isMissionClear[index] = true;
+    }
+
+    //사용자가 미션 리스트를 확인했는지 체크
+    public void MissionCheck()
+    {
+        isMissionCheck = true;
     }
 
     //길 찾기 시작

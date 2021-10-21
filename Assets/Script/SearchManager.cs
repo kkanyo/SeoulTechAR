@@ -1,36 +1,31 @@
 using Mono.Data.Sqlite;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SearchManager : MonoBehaviour
 {
-    private string mDatabaseFileName = "BuildingInfo.db";
-    private DatabaseManager mDatabaseManager;
+    private GameObject buildingList;
+    private TMPro.TMP_InputField searchInput;
+    private Text searchMode;
 
-    public GameObject buildingList;
-    public TMPro.TMP_InputField searchInput;
-    public Text searchMode;
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        mDatabaseManager = new DatabaseManager(mDatabaseFileName);
+    private void Start() {
+        buildingList = transform.Find("Scroll View").Find("Viewport").Find("BuildingList").gameObject;
+        searchInput = transform.Find("SearchInput").GetComponent<TMPro.TMP_InputField>();
+        searchMode = transform.Find("Dropdown").Find("SearchMode").GetComponent<Text>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
+    //검색 알고리즘
     public void UpdateList()
     {
+        DatabaseManager databaseManager = GameManager.Instance.databaseManager;
+
         SqliteDataReader tempSql = null;
 
         switch (searchMode.text)
         {
             case "건물명":
-                tempSql = mDatabaseManager.SelectWhere("Buildings", "DISTINCT",
+                tempSql = databaseManager.SelectWhere("Buildings", "DISTINCT",
                     new string[] {"BuildingNumber"},
                     new string[] {"BuildingName"},
                     new string[] {" LIKE "},
@@ -38,7 +33,7 @@ public class SearchManager : MonoBehaviour
                     "BuildingNumber", "ASC");
                 break;
             case "학과명":
-                tempSql = mDatabaseManager.SelectWhere("Major", "DISTINCT",
+                tempSql = databaseManager.SelectWhere("Major", "DISTINCT",
                     new string[] {"BuildingNumber"},
                     new string[] {"MajorName"},
                     new string[] {" LIKE "},
@@ -46,7 +41,7 @@ public class SearchManager : MonoBehaviour
                     "BuildingNumber", "ASC" );
                 break;
             case "편의시설":
-                tempSql = mDatabaseManager.SelectWhere("Facilities", "DISTINCT",
+                tempSql = databaseManager.SelectWhere("Facilities", "DISTINCT",
                     new string[] {"BuildingNumber"},
                     new string[] {"FacilityType"},
                     new string[] {" LIKE "},
@@ -54,7 +49,7 @@ public class SearchManager : MonoBehaviour
                     "BuildingNumber", "ASC" );
                 break;
             case "교수명":
-                tempSql = mDatabaseManager.SelectWhere("Professor", "DISTINCT",
+                tempSql = databaseManager.SelectWhere("Professor", "DISTINCT",
                     new string[] {"BuildingNumber"},
                     new string[] {"ProfessorName"},
                     new string[] {" LIKE "},
@@ -90,5 +85,11 @@ public class SearchManager : MonoBehaviour
         }
 
         tempSql.Close();
+    }
+
+    //검색어 초기화
+    public void InitSearchData()
+    {
+        searchInput.text = "";
     }
 }

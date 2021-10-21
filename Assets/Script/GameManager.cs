@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     #region Singleton
     private static GameManager instance = null;
 
+    public DatabaseManager databaseManager;
     public string bdNumSelected;
     public int currentCanvasNum = 0;
     public bool isNavigate = false;
@@ -39,18 +40,8 @@ public class GameManager : MonoBehaviour
         {
             StartCoroutine(FadeCoroutine());
         }
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
         
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        databaseManager = new DatabaseManager("BuildingInfo.db");
     }
 
     public static GameManager Instance
@@ -93,6 +84,7 @@ public class GameManager : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "Start")
         {
             StartCoroutine(FadeCoroutine());
+            
         }
     }
         
@@ -111,11 +103,13 @@ public class GameManager : MonoBehaviour
         }
 
         MoveScene("Main");
+
+        StopCoroutine(FadeCoroutine());
+        yield break;
     }
 
-    public void MoveScene(string sceneName)
+    private void MoveScene(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
-        StopCoroutine(FadeCoroutine());
     }
 }

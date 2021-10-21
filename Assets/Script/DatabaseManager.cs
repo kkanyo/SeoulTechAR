@@ -81,13 +81,6 @@ public class DatabaseManager
         return reader;
     }
 
-    public SqliteDataReader ReadFullTable(string tableName)
-    {
-        string query = "SELECT * FROM " + tableName;
-        
-        return ExecuteQuery(query);
-    }
-
     //SELECT (option) items FROM tablename WHERE col op values AND ``` (ORDER BY)
     public SqliteDataReader SelectWhere(string tableName, string option, string[] items,
                                         string[] col, string[] operation, string[] values,

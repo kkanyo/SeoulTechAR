@@ -5,44 +5,39 @@ using UnityEngine.UI;
 
 public class UpdateInfo : MonoBehaviour
 {
-    private string databaseFileName = "BuildingInfo.db";
-    private DatabaseManager databaseManager;
-    
-    public Image infoBuildingImage;
-    public Text infoNumText;
-    public Text infoNameText;
-    public Text infoContentText;
+    private Image infoImage;
+    private Text[] infoTextList;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        databaseManager = new DatabaseManager(databaseFileName);
-
+        infoImage = transform.Find("BuildingImage").GetComponent<Image>();
+        infoTextList = new Text[] {
+            transform.Find("BuildingNumText").GetComponent<Text>(),
+            transform.Find("BuildingNameText").GetComponent<Text>(),
+            transform.Find("Scroll View").Find("Viewport").Find("BuildingContent").Find("BuildingContentText").GetComponent<Text>()
+        };
+        
         StartCoroutine(ApplyBuildingInfo());
     }
 
-    // Update is called once per frame
-    void Update()
+    private IEnumerator ApplyBuildingInfo()
     {
-
-    }
-
-    IEnumerator ApplyBuildingInfo()
-    {
-        var wait = new WaitForSeconds(0.05f);
-
+        var wait = new WaitForEndOfFrame();
         while (true)
         {
-            if (GameManager.Instance.currentCanvasNum == 1)
+            if (GameManager.Instance.bdNumSelected != infoTextList[0].text)
+            {
                 UpdateBuildingInfo();
-
+            }
             yield return wait;
         }
     }
 
-    public void UpdateBuildingInfo()
+    private void UpdateBuildingInfo()
     {
-        Debug.Log(GameManager.Instance.currentCanvasNum);
+        DatabaseManager databaseManager = GameManager.Instance.databaseManager;
+
         string targetNum = GameManager.Instance.bdNumSelected;
         string targetName = "";
         string targetContent = "";
@@ -124,12 +119,12 @@ public class UpdateInfo : MonoBehaviour
             }
         }
 
-        //Update text and image of InfoCanvas
-        infoBuildingImage.sprite = 
+        //건물 정보 화면의 데이터들을 변경
+        infoImage.sprite = 
             Resources.Load<Sprite>("Image/BuildingPictures/" + targetNum);
-        infoNameText.text = targetName;
-        infoNumText.text = targetNum;
-        infoContentText.text = targetContent;
+        infoTextList[0].text = targetNum;
+        infoTextList[1].text = targetName;
+        infoTextList[2].text = targetContent;
 
         tempSql.Close();
     }
