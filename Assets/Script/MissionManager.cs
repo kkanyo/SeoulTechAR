@@ -5,9 +5,6 @@ using UnityEngine.UI;
 
 public class MissionManager : MonoBehaviour
 {
-    const int NUM_OF_MISSIONS = 6;
-    private UiController uiController;
-    
     #region forMission
     private bool isMissionCheck;
     private bool[] isMissionClear;  //각 미션이 완료됐는지 기록
@@ -46,8 +43,6 @@ public class MissionManager : MonoBehaviour
             temp.GetChild(4).GetComponent<Image>(),
             temp.GetChild(5).GetComponent<Image>()
         };
-
-        uiController = new UiController();
 
         isMissionCheck = false;
         isMissionClear = new bool[] {false, false, false, false, false};
@@ -135,7 +130,7 @@ public class MissionManager : MonoBehaviour
             userMajorOffice = null;
 
             //토스트 메세지 출력
-            uiController.DisplayAndroidToastMessage("잘못된 입력입니다.");
+            UiController.DisplayAndroidToastMessage("잘못된 입력입니다.");
         }
         else
         {
@@ -229,7 +224,7 @@ public class MissionManager : MonoBehaviour
         StartCoroutine(NavigateCoroutine());
 
         Debug.Log("안내를 시작합니다.");
-        uiController.DisplayAndroidToastMessage("안내를 시작합니다.");
+        UiController.DisplayAndroidToastMessage("안내를 시작합니다.");
     }
 
     //길 찾기 종료
@@ -243,6 +238,6 @@ public class MissionManager : MonoBehaviour
         StopCoroutine(NavigateCoroutine());
 
         Debug.Log("안내를 종료합니다.");
-        uiController.DisplayAndroidToastMessage("안내를 종료합니다.");
+        UiController.DisplayAndroidToastMessage("안내를 종료합니다.");
     }
 }

@@ -21,11 +21,14 @@ public class UpdateInfo : MonoBehaviour
         StartCoroutine(ApplyBuildingInfo());
     }
 
+    //갱신된 건물 정보 적용 Coroutine
     private IEnumerator ApplyBuildingInfo()
     {
         var wait = new WaitForEndOfFrame();
+
         while (true)
         {
+            //현재 건물 정보와 선택된 건물의 정보가 다를 경우
             if (GameManager.Instance.bdNumSelected != infoTextList[0].text)
             {
                 UpdateBuildingInfo();
@@ -34,6 +37,7 @@ public class UpdateInfo : MonoBehaviour
         }
     }
 
+    //데이터베이스에서 건물 정보 획득 후 갱신
     private void UpdateBuildingInfo()
     {
         DatabaseManager databaseManager = GameManager.Instance.databaseManager;

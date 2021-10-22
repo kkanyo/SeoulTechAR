@@ -12,8 +12,8 @@ public class UiController : MonoBehaviour
     //이전 화면을 저장하기 쉬한 스택
     private int[] stackCanvas = new int[NUM_OF_CANVAS];
     private int stackIndex;
+
     private Ray tempRay;
-    private Vector2 nowPos, prePos, movePosDiff;
 
     //0: AR, 1: Info, 2: Map, 3: Mission, 4: Search 5: LarBg
     public Canvas[] canvasList;
@@ -21,13 +21,14 @@ public class UiController : MonoBehaviour
     //0: UI, 1: Minimap, 2: Lar
     public Camera[] cameraList;
     public GameObject buildings;
+    private int clickCount;
+
 
     // Start is called before the first frame update
     private void Start()
     {
         updateInfo = new UpdateInfo();
 
-        //초기 실행 시 화면 설정
         canvasList[0].enabled = true;
         canvasGroupList[0].alpha = 1;
 
@@ -39,21 +40,25 @@ public class UiController : MonoBehaviour
 
         stackIndex = 0;
         stackCanvas[stackIndex] = 0;
+
+        clickCount = 0;
     }
     
+
     // Update is called once per frame
     private void Update()
     {
         //Raycast를 이용하여 오브젝트와 충돌 감지
         if (Input.GetMouseButtonDown(0))
-        {
-            Debug.Log(EventSystem.current.currentSelectedGameObject);
+        {   
+            //마우스가 클릭된 좌표에 Ray 저장
             tempRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         }
         if (Input.GetMouseButtonUp(0))
         {
             RaycastHit downHit, upHit;
 
+            //마우스가 클릭된 Ray와 충돌된 오브젝트 RaycastHit 정보
             Physics.Raycast(tempRay, out downHit);
 
             tempRay = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -72,7 +77,7 @@ public class UiController : MonoBehaviour
                 }
             }
 
-            //UGUI에서 작동
+            //For UGUI
             GameObject tempObj;
 
             if ( (tempObj = EventSystem.current.currentSelectedGameObject) && tempObj.tag == "BuildingTag" )
@@ -80,15 +85,35 @@ public class UiController : MonoBehaviour
                 GameManager.Instance.bdNumSelected = tempObj.name;   
             }
         }
-        
+
+        //뒤로가기 버튼 1초 안에 2번 연속 누를 시 어플 종료
         if (Application.platform == RuntimePlatform.Android)
         {
             if (Input.GetKey(KeyCode.Escape))
-                ConvertCanvas(-1);
+            {
+                clickCount++;
+                DisplayAndroidToastMessage("한 번 더 누를 시 어플이 종료됩니다.");
+
+                if (!IsInvoking("InitDoubleClick"))
+                    Invoke("InitDoubleClick", 1.0f);
+            }
+            if (clickCount == 2)
+            {
+                CancelInvoke("InitDoubleClick");
+                Application.Quit();
+            }
         }
     }
 
 
+    private void InitDoubleClick()
+    {
+        clickCount = 0;
+    }
+
+
+    //Canvas 활설화/비활성화를 통해 화면을 전환
+    //stackCanvas에 거쳐온 화면의 순서를 저장하면서 이전 화면으로 전환할 수 있도록 함
     public void ConvertCanvas(int canvasNum)
     {
         int beforeStack, currentStack;
@@ -107,7 +132,6 @@ public class UiController : MonoBehaviour
 
             GameManager.Instance.currentCanvasNum = beforeStack;
         }
-        //화면 이동 버튼 클릭 시
         else
         {
             beforeStack = stackCanvas[stackIndex];
@@ -123,10 +147,11 @@ public class UiController : MonoBehaviour
         }
 
 
-        //카메라 제어
+        //------카메라 제어-------
+        //AR 화면인 경우
         if (stackCanvas[stackIndex] == 0)
         {
-            //AR 화면으로 이동 시 캔버스 스택 초기화
+            //캔버스 스택 초기화
             stackIndex = 0;
 
             buildings.SetActive(true);
@@ -140,6 +165,7 @@ public class UiController : MonoBehaviour
             cameraList[0].gameObject.SetActive(true);
             cameraList[2].gameObject.SetActive(false);
 
+            //AR 화면이 아니고, 2D 지도 화면인 경우
             if (stackCanvas[stackIndex] == 2)
             {
                 buildings.SetActive(true);
@@ -154,7 +180,6 @@ public class UiController : MonoBehaviour
     }
 
 
-    //팝업 창 종료
     public void ClosePopUp(GameObject popUp)
     {
         popUp.SetActive(false);
@@ -163,7 +188,7 @@ public class UiController : MonoBehaviour
 
     //Android Native
     //토스트 메시지 출력
-    public void DisplayAndroidToastMessage(string message)
+    public static void DisplayAndroidToastMessage(string message)
     {
         if (Application.platform == RuntimePlatform.Android)
         {

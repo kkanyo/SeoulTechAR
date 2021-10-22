@@ -34,10 +34,6 @@ public class LocativeGPS : MonoBehaviour
     [Tooltip("Smartphone only")]
     public gpsModes gpsMode;
 
-
-    [Header("Debug Settings")]
-    public Boolean ShowDebugConsole;
-
     [Header("Editor Mode simulator")]
     public double EdLatitude;
     public double EdLongitude;

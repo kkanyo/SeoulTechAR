@@ -25,13 +25,16 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
             
+            //Scene 전환 시 파괴되지 않음
             DontDestroyOnLoad(this.gameObject);
         }
         else
         {
+            //Scene 전환 후 이미 GameManager가 존재한다면 자신을 삭제
             Destroy(this.gameObject);
         }
 
+        //사용자에게 접근 권한 허용 요청
         if (!Application.isEditor)
         {
             StartCoroutine(PermissionCheckCoroutine());
@@ -44,6 +47,7 @@ public class GameManager : MonoBehaviour
         databaseManager = new DatabaseManager("BuildingInfo.db");
     }
 
+    //Property
     public static GameManager Instance
     {
         get
@@ -56,7 +60,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
+    //접근 권한 허용 체크 Coroutine
     IEnumerator PermissionCheckCoroutine()
     {
         var waitFrame = new WaitForEndOfFrame();
@@ -64,11 +68,14 @@ public class GameManager : MonoBehaviour
         var waitFocus = new WaitUntil(() => Application.isFocused == true);
         
         yield return waitFrame;
-
+        
+        //카메라 권한 체크
         if (Permission.HasUserAuthorizedPermission(Permission.Camera) == false)
-        {
+        {   
+            //권한 요청
             Permission.RequestUserPermission(Permission.Camera);
 
+            //0.2초 딜레이 후 Focus 체크
             yield return waitSec;
             yield return waitFocus;
         }
@@ -88,7 +95,7 @@ public class GameManager : MonoBehaviour
         }
     }
         
-
+    //Fade Effect Coroutine
     IEnumerator FadeCoroutine()
     {
         var wait = new WaitForSeconds(0.01f);
@@ -108,6 +115,7 @@ public class GameManager : MonoBehaviour
         yield break;
     }
 
+    //Scene 이동
     private void MoveScene(string sceneName)
     {
         SceneManager.LoadScene(sceneName);

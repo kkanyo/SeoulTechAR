@@ -8,7 +8,7 @@ public class DatabaseManager
     private SqliteCommand databaseCommand;
     private SqliteDataReader reader;
 
-    //생성자
+
     public DatabaseManager(string databaseFileName)
     {
         OpenDatabase(databaseFileName);
@@ -71,6 +71,8 @@ public class DatabaseManager
         Debug.Log("Disconnected from database.");
     }
 
+
+    //쿼리문 실행
     public SqliteDataReader ExecuteQuery(string sqlQuery)
     {
         databaseCommand = databaseConnection.CreateCommand();
