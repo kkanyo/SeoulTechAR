@@ -45,7 +45,7 @@ public class MissionManager : MonoBehaviour
         };
 
         isMissionCheck = false;
-        isMissionClear = new bool[] {false, false, false, false, false};
+        isMissionClear = new bool[] {false, false, false, false, false, false};
         gradeList = new string[] { "Lv1. 갓난내기", "Lv2. 새내기", "Lv3. 밥값내기", "Lv4. 헌내기" };
         gradeText.text = gradeList[0];
         levelCount = 0;
@@ -81,19 +81,7 @@ public class MissionManager : MonoBehaviour
             {
                 if (isMissionCheck)
                 {
-                    if (targetNum == "1" && !isMissionClear[0])
-                    {
-                        MissionClear(targetNum);
-                    }
-                    else if ((targetNum == "7" || targetNum == "37" || targetNum == "52")
-                            && !isMissionClear[1])
-                    {
-                        MissionClear(targetNum);
-                    }
-                    else if (targetNum == userMajorOffice && !isMissionClear[2])
-                    {
-                        MissionClear(targetNum);
-                    }
+                    MissionClear(targetNum);
                 }
                 
                 EndNavigate();
@@ -186,7 +174,9 @@ public class MissionManager : MonoBehaviour
     //완료된 미션의 UI 변경
     private void UpdateMissionUI(int index)
     {
-        Debug.Log("성공");
+        if (!isMissionClear[index])
+        {
+            Debug.Log("성공");
         completePopUp.SetActive(true);
 
         gradeText.text = gradeList[(++levelCount)/2];
@@ -201,6 +191,7 @@ public class MissionManager : MonoBehaviour
         }
         
         isMissionClear[index] = true;
+        }
     }
 
     //사용자가 미션 리스트를 확인했는지 체크

@@ -107,15 +107,17 @@ public class LocativeGPS : MonoBehaviour
             //카메라 연동 시작
             if (selectedCameraIndex >= 0)
             {
-                cam = new WebCamTexture(WebCamTexture.devices[selectedCameraIndex].name);
+                cam = new WebCamTexture(WebCamTexture.devices[selectedCameraIndex].name, Screen.width/2, Screen.height/2);
                 
                 cam.Play();
 
+                cam.requestedFPS = 30f;
+
                 background.texture = cam;
-                if (devices[selectedCameraIndex].isAutoFocusPointSupported)
-                    cam.autoFocusPoint = null;
-                else
-                    cam.autoFocusPoint = new Vector2(0, 0);
+
+                //화면 비율에 맞게 카메라 조정
+                float ratio = (float)cam.width / (float)cam.height;
+                fit.aspectRatio = ratio;
             }
 
 
@@ -169,7 +171,7 @@ public class LocativeGPS : MonoBehaviour
     {
         if (!Application.isEditor)
         {
-            //
+            //AR 화면에서만 카메라 작동
             if (GameManager.Instance.currentCanvasNum == 0)
             {
                 if (!cam.isPlaying)
@@ -196,17 +198,8 @@ public class LocativeGPS : MonoBehaviour
                     altitude = BodyHeight;                      
                 }
 
-
                 if (arReady)
                 {
-                    //update Camera
-                    float ratio = (float)cam.width / (float)cam.height;
-                    fit.aspectRatio = ratio;
-                    float scaleY = cam.videoVerticallyMirrored ? -1.0f : 1.0f;
-                    background.rectTransform.localScale = new Vector3(1f, scaleY, 1f);
-                    int orient = -cam.videoRotationAngle;
-                    background.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
-
                     //Update Gyro
                     transform.localRotation = gyro.attitude * rotation;
                 }

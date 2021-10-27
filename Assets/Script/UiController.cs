@@ -51,31 +51,37 @@ public class UiController : MonoBehaviour
         //Raycast를 이용하여 오브젝트와 충돌 감지
         if (Input.GetMouseButtonDown(0))
         {   
-            //마우스가 클릭된 좌표에 Ray 저장
+            //클릭다운된 좌표에 Ray 저장
             tempRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         }
         if (Input.GetMouseButtonUp(0))
         {
             RaycastHit downHit, upHit;
 
-            //마우스가 클릭된 Ray와 충돌된 오브젝트 RaycastHit 정보
-            Physics.Raycast(tempRay, out downHit);
-
-            tempRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            //클릭하고 벗어나거나 클릭된 상태로 들어왔을 때 실행되는 것을 방지
-            if (Physics.Raycast(tempRay, out upHit) && upHit.Equals(downHit))
+            //클릭업된 Ray와 충돌된 오브젝트 RaycastHit 정보
+            if (Physics.Raycast(tempRay, out downHit))
             {
-                int currentCanvasNum = GameManager.Instance.currentCanvasNum;
-                //AR화면에서는 ARTag만 Map화면에서는 MapTag의 오브젝트만 충돌
-                if ((upHit.collider.gameObject.tag == "ARTag" && currentCanvasNum == 0)
-                    || (upHit.collider.gameObject.tag == "MapTag" && currentCanvasNum == 2))
+                tempRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+                if (Physics.Raycast(tempRay, out upHit))
                 {
-                    GameManager.Instance.bdNumSelected = upHit.collider.gameObject.name.Split('_')[0];
-                    //Info화면으로 전환
-                    ConvertCanvas(1);
+                    //아이콘 밖으로 클릭하고 벗어나거나 밖에서 클릭된 상태로 들어왔을 때 실행되는 것을 방지
+                    if (upHit.collider.gameObject.name == downHit.collider.gameObject.name)
+                    {
+                        int currentCanvasNum = GameManager.Instance.currentCanvasNum;
+                        //AR화면에서는 ARTag만 Map화면에서는 MapTag의 오브젝트만 충돌
+                        if ((upHit.collider.gameObject.tag == "ARTag" && currentCanvasNum == 0)
+                            || (upHit.collider.gameObject.tag == "MapTag" && currentCanvasNum == 2))
+                        {
+                            GameManager.Instance.bdNumSelected = upHit.collider.gameObject.name.Split('_')[0];
+                            //Info화면으로 전환
+                            ConvertCanvas(1);
+                        }
+                    }
+                    
                 }
             }
+
 
             //For UGUI
             GameObject tempObj;
