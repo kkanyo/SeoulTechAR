@@ -72,22 +72,21 @@ public class LocativeGPS : MonoBehaviour
         background      = transform.Find("LAR_BackgroundCamera").Find("UI_Background").Find("Background").gameObject.GetComponent<RawImage>();
         fit             = transform.Find("LAR_BackgroundCamera").Find("UI_Background").Find("Background").gameObject.GetComponent<AspectRatioFitter>();
 
-
         //GPS NATIVE TOOLKIT
         if (!Application.isEditor)
         {
+            background.enabled = true;
+            
             // Position Camera
             cameraContainer = new GameObject("Camera Container");
             cameraContainer.transform.position = transform.position;
             transform.SetParent(cameraContainer.transform);
-            cameraContainer.transform.rotation = Quaternion.Euler(90f, -90F, 0); //(90f, 0, 0);
-
+            cameraContainer.transform.rotation = Quaternion.Euler(90f, -90F, 0); //(90f, 0, 0);            
 
             // check if we support Gyro
             if (!SystemInfo.supportsGyroscope)
             {
                 Debug.Log("no Gyro");
-
             }
 
             //스마트폰의 카메라 정보
@@ -107,21 +106,19 @@ public class LocativeGPS : MonoBehaviour
             //카메라 연동 시작
             if (selectedCameraIndex >= 0)
             {
-                cam = new WebCamTexture(WebCamTexture.devices[selectedCameraIndex].name, Screen.width/2, Screen.height/2);
+                cam = new WebCamTexture(WebCamTexture.devices[selectedCameraIndex].name, Screen.width, Screen.height);
                 
                 cam.Play();
-
-                cam.requestedFPS = 30f;
-
-                background.texture = cam;
 
                 //화면 비율에 맞게 카메라 조정
                 float ratio = (float)cam.width / (float)cam.height;
                 fit.aspectRatio = ratio;
+
+                background.texture = cam;
             }
 
 
-            //자이로센서
+            // gyro
             gyro = Input.gyro;
             gyro.enabled = true;
             rotation = new Quaternion(0, 0, 1, 0);
@@ -229,7 +226,6 @@ public class LocativeGPS : MonoBehaviour
                     currentRotation.y = Mathf.Clamp(currentRotation.y, -80, 80);
                     Camera.main.transform.rotation = Quaternion.Euler(currentRotation.y, currentRotation.x, 0);
             }
-
 
             // keyboard
             double slat= 0.000001;

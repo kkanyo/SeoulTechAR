@@ -30,7 +30,8 @@ public class LocativeTarget : MonoBehaviour
         transform.position = coord;
     }
 
-
+    
+    // 사용자의 위치를 기준으로 상대적인 좌표 계산
     private Vector3 calculaPosCoordCam()
     {
         double dlat = latitude - LocativeGPS.Instance.latitude;
@@ -47,6 +48,7 @@ public class LocativeTarget : MonoBehaviour
     }
 
 
+    // 위도경도 좌표를 xy 좌표로 변환
     private double getCoordEmMetrosDeRaio(double raio, double angulo)
     {
         double metros = (raio / 180) * Mathf.PI;
