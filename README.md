@@ -34,10 +34,11 @@ COVID-19 유행으로 학교를 방문하지 못해 재학생들이 길을 찾�
 ### 개발 환경
 
 1. 사용 플랫폼: Android
-2. 제작 인원: 1인
+2. 제작 인원: 2인 (개발 1인, 보조 1인)
 3. 제작 기간: 3월 ~ 10월
 4. 사용 언어 및 툴: Unity, C#, SQLite
 
 ---
 ### 관련 링크
-- 시연 동영상(YouTube): https://youtu.be/ZBsZO1CpiNk
+- 시연 동영상(YouTube): https://youtu.be/Ym2_a9JGPjE
+- 기타 자료(Google Drive): https://drive.google.com/drive/folders/1UMbf9koEvebmiqyA9H31NRszR7rRjlKS?usp=sharing
