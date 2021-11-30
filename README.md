@@ -41,4 +41,4 @@ COVID-19 유행으로 학교를 방문하지 못해 재학생들이 길을 찾�
 ---
 ### 관련 링크
 - 시연 동영상(YouTube): https://youtu.be/Ym2_a9JGPjE
-- 기타 자료(Google Drive): https://drive.google.com/drive/folders/1UMbf9koEvebmiqyA9H31NRszR7rRjlKS?usp=sharing
+- 기타 자료(Google Drive): https://drive.google.com/drive/folders/1rwQbo8NpXto7FJ0BVi4Es7e3ZNyisS6k?usp=sharing
