@@ -3,13 +3,15 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+//미션 수행 관련 기능 및 길 찾기 기능
 public class MissionManager : MonoBehaviour
 {
+    //[미션과 관련된 변수]
     #region forMission
-    private bool isMissionCheck;
+    private bool isMissionCheck;    //미션을 확인했는지 체크
     private bool[] isMissionClear;  //각 미션이 완료됐는지 기록
     private string userMajorOffice;
-    private string[] gradeList;
+    private string[] gradeList;     //사용자 등급 리스트
     private int levelCount;
     private Text gradeText;
     private TMPro.TMP_InputField myMajor;
@@ -20,6 +22,7 @@ public class MissionManager : MonoBehaviour
     public GameObject completePopUp;
     #endregion
 
+    //[길 찾기 기능과 관련된 변수]
     #region forNavigate
     private GameObject naviTarget;
     private Vector3 targetPosition;
@@ -29,6 +32,7 @@ public class MissionManager : MonoBehaviour
 
     private void Start()
     {
+        //변수들을 초기화
         Transform temp = transform.Find("Scroll View").Find("Viewport").Find("MissionList");
 
         gradeText = transform.Find("GradeText").Find("Text").GetComponent<Text>();
@@ -55,7 +59,7 @@ public class MissionManager : MonoBehaviour
         navigator.SetActive(false);
     }
     
-    //길 찾기 코루틴
+    //<<길 찾기 코루틴>>
     IEnumerator NavigateCoroutine()
     {
         var wait = new WaitForEndOfFrame();
@@ -66,7 +70,7 @@ public class MissionManager : MonoBehaviour
 
         while (GameManager.Instance.isNavigate)
         {
-            //목적지까지와의 거리
+            //목적지까지와의 거리 계산
             dist = buildingList.transform.Find(targetNum)
                     .Find(targetNum + "_Target").position.magnitude;
 
@@ -76,7 +80,7 @@ public class MissionManager : MonoBehaviour
 
             navigator.transform.LookAt(targetPosition);
 
-            //목적지가 미션 건물이고 목적지와 가까워지면 미션 성공
+            //목적지가 미션 건물이고 목적지와 가까워지면 미션 성공 처리
             if (dist < 30)
             {
                 if (isMissionCheck)
@@ -91,9 +95,10 @@ public class MissionManager : MonoBehaviour
         }
     }
     
-    //사용자의 학과 설정
+    //<<사용자의 학과 설정>>
     public void SetMyMajor()
     {
+        //데이터 베이스에 접근
         DatabaseManager databaseManager = GameManager.Instance.databaseManager;
 
         SqliteDataReader tempSql = databaseManager.SelectWhere("Major", null,
@@ -107,12 +112,13 @@ public class MissionManager : MonoBehaviour
 
         int rowCount = 0;
 
+        //검색한 데이터의 수를 계산
         while (tempSql.Read())
         {
             rowCount++;
         }
         
-        //입력 학과명이 옳바르지 않은 경우 예외 처리
+        //입력된 학과명으로 검색된 학과가 1개가 아닌 경우 예외 처리
         if (rowCount != 1)
         {
             userMajorOffice = null;
@@ -139,9 +145,10 @@ public class MissionManager : MonoBehaviour
         tempSql.Close();
     }
 
-    //완료된 미션 판단
+    //<<완료된 미션 판단>>
     private void MissionClear(string targetNum)
     {
+        //미션에 해당하는 목적지에 도착하면 해당 미션 완료 작업
         switch (targetNum)
         {
             case "1":
@@ -171,64 +178,72 @@ public class MissionManager : MonoBehaviour
         }
     }
 
-    //완료된 미션의 UI 변경
+    //<<완료된 미션의 UI 변경>>
     private void UpdateMissionUI(int index)
     {
+        //완료되지 않은 미션의 UI를 완료 처리
         if (!isMissionClear[index])
         {
-            Debug.Log("성공");
-        completePopUp.SetActive(true);
+            //Debug.Log("성공");
+            completePopUp.SetActive(true);
 
-        gradeText.text = gradeList[(++levelCount)/2];
+            //미션 2개가 성공할 때마다 등급 상승
+            gradeText.text = gradeList[(++levelCount)/2];
 
-        missionList[index].color = Color.grey;
+            missionList[index].color = Color.grey;
 
-        missionList[index].transform.Find("DoneText").GetComponent<TMPro.TMP_Text>().text = "완료";
+            missionList[index].transform.Find("DoneText").GetComponent<TMPro.TMP_Text>().text = "완료";
 
-        for (int i = 3; i < missionList[index].transform.childCount; i++)
-        {
-            missionList[index].transform.GetChild(i).GetComponent<Button>().enabled = false;
-        }
+            //완료된 미션 버튼 비활성화
+            for (int i = 3; i < missionList[index].transform.childCount; i++)
+            {
+                missionList[index].transform.GetChild(i).GetComponent<Button>().enabled = false;
+            }
         
         isMissionClear[index] = true;
         }
     }
 
-    //사용자가 미션 리스트를 확인했는지 체크
+    //<<사용자가 미션 리스트를 확인했는지 체크>>
     public void MissionCheck()
     {
         isMissionCheck = true;
     }
 
-    //길 찾기 시작
+    //<<길 찾기 시작 - 길 찾기 버튼 클릭>>
     public void StartNavigate()
     {
         string targetNum = GameManager.Instance.bdNumSelected;
 
+        //길 찾기 목적지 설정
         naviTarget = buildingList.transform.Find(targetNum).Find(targetNum + "_Target").gameObject;
 
+        //UI 활성화
         cancelNaviBtn.SetActive(true);
         navigator.SetActive(true);
 
         GameManager.Instance.isNavigate = true;
 
+        //길 찾기 코루틴 시작
         StartCoroutine(NavigateCoroutine());
 
-        Debug.Log("안내를 시작합니다.");
+        //Debug.Log("안내를 시작합니다.");
         UiController.DisplayAndroidToastMessage("안내를 시작합니다.");
     }
 
-    //길 찾기 종료
+    //<<길 찾기 종료 - 안내 종료 버튼 클릭>>
     public void EndNavigate()
     {
+        //UI 비활성화
         cancelNaviBtn.SetActive(false);
         navigator.SetActive(false);
 
         GameManager.Instance.isNavigate = false;
 
+        //길 찾기 코루틴 종료
         StopCoroutine(NavigateCoroutine());
 
-        Debug.Log("안내를 종료합니다.");
+        //Debug.Log("안내를 종료합니다.");
         UiController.DisplayAndroidToastMessage("안내를 종료합니다.");
     }
 }

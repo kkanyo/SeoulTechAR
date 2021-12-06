@@ -2,6 +2,7 @@ using Mono.Data.Sqlite;
 using System.IO;
 using UnityEngine;
 
+//데이터 베이스 접근 및 쿼리 문 함수화
 public class DatabaseManager
 {
     private SqliteConnection databaseConnection;
@@ -14,24 +15,30 @@ public class DatabaseManager
         OpenDatabase(databaseFileName);
     }
 
-    //db 파일의 경로에 접근하여 연결
+    //<<db 파일의 경로에 접근하여 연결>>
     public void OpenDatabase(string databaseFileName)
     {
         string file_path = Path.Combine(Application.persistentDataPath, databaseFileName);
 
         if (!File.Exists(file_path))
         {
-            //안드로이드 플랫폼
+            //안드로이드 플랫폼일 때 경로 추적
             if (Application.platform == RuntimePlatform.Android)
             {
-                    WWW temp_load_db = new WWW("jar:file://" + Application.dataPath
-                        + "!/assets/" + databaseFileName);
+                //안드로이드에서의 StreamingAssets 경로
+                WWW temp_load_db = new WWW("jar:file://" + Application.dataPath
+                    + "!/assets/" + databaseFileName);
 
-                    while (!temp_load_db.isDone) { };
+                //예외 처리
+                while (!temp_load_db.isDone) { 
+                    Debug.Log("Incorrect file path!");
+                    return; 
+                };
 
-                    File.WriteAllBytes(file_path, temp_load_db.bytes);
+                //Application.persistentDataPath에 저장
+                File.WriteAllBytes(file_path, temp_load_db.bytes);
             }
-            //그 외 플랫폼
+            //그 외 플랫폼일 때 경로 추적
             else
             {
                 File.Copy(Path.Combine(Application.streamingAssetsPath, databaseFileName), file_path);
@@ -42,10 +49,10 @@ public class DatabaseManager
 
         databaseConnection = new SqliteConnection(temp_uri_path);
         databaseConnection.Open();
-        Debug.Log("Connected to database");
+        //Debug.Log("Connected to database");
     }
 
-    //DB 연결 끊기
+    //<<DB 연결 끊기>>
     public void CloseSqlConnection()
     {
         if (databaseCommand != null)
@@ -68,11 +75,11 @@ public class DatabaseManager
         }
 
         databaseConnection = null;
-        Debug.Log("Disconnected from database.");
+        //Debug.Log("Disconnected from database.");
     }
 
 
-    //쿼리문 실행
+    //<<Query문 실행>>
     public SqliteDataReader ExecuteQuery(string sqlQuery)
     {
         databaseCommand = databaseConnection.CreateCommand();
@@ -83,7 +90,8 @@ public class DatabaseManager
         return reader;
     }
 
-    //SELECT (option) items FROM tablename WHERE col op values AND ``` (ORDER BY)
+    //<<SQL Qeury문 함수>>
+    //<<SELECT (option) items FROM tablename WHERE col op values AND ``` (ORDER BY)>>
     public SqliteDataReader SelectWhere(string tableName, string option, string[] items,
                                         string[] col, string[] operation, string[] values,
                                         string orderCol, string type)

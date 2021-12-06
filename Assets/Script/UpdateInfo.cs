@@ -3,12 +3,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+//건물 정보 화면 데이터 업데이트 기능
 public class UpdateInfo : MonoBehaviour
 {
     private Image infoImage;
     private Text[] infoTextList;
 
-    // Start is called before the first frame update
     private void Start()
     {
         infoImage = transform.Find("BuildingImage").GetComponent<Image>();
@@ -18,14 +18,15 @@ public class UpdateInfo : MonoBehaviour
             transform.Find("Scroll View").Find("Viewport").Find("BuildingContent").Find("BuildingContentText").GetComponent<Text>()
         };
         
+        //건물 정보 화면이 활성화되면 업데이트 실행
         StartCoroutine(ApplyBuildingInfo());
     }
 
-    //갱신된 건물 정보 적용 Coroutine
+    //<<갱신된 건물 정보 업데이트 Coroutine>>
     private IEnumerator ApplyBuildingInfo()
     {
         var wait = new WaitForEndOfFrame();
-
+        
         while (true)
         {
             //현재 건물 정보와 선택된 건물의 정보가 다를 경우
@@ -33,15 +34,18 @@ public class UpdateInfo : MonoBehaviour
             {
                 UpdateBuildingInfo();
             }
+            Debug.Log("ㅖㅏ");
             yield return wait;
         }
     }
 
-    //데이터베이스에서 건물 정보 획득 후 갱신
+    //<<데이터베이스에서 건물 정보 획득 후 업데이트>>
     private void UpdateBuildingInfo()
     {
+        //데이터 베이스에 접근
         DatabaseManager databaseManager = GameManager.Instance.databaseManager;
 
+        //정보를 담기 위한 변수
         string targetNum = GameManager.Instance.bdNumSelected;
         string targetName = "";
         string targetContent = "";
@@ -123,7 +127,7 @@ public class UpdateInfo : MonoBehaviour
             }
         }
 
-        //건물 정보 화면의 데이터들을 변경
+        //건물 정보 화면의 데이터들을 업데이트
         infoImage.sprite = 
             Resources.Load<Sprite>("Image/BuildingPictures/" + targetNum);
         infoTextList[0].text = targetNum;

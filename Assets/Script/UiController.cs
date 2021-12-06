@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+//<<UI 관련 기능>>
 public class UiController : MonoBehaviour
 {
     const int NUM_OF_CANVAS = 6;
@@ -24,7 +25,6 @@ public class UiController : MonoBehaviour
     private int clickCount;
 
 
-    // Start is called before the first frame update
     private void Start()
     {
         updateInfo = new UpdateInfo();
@@ -44,8 +44,6 @@ public class UiController : MonoBehaviour
         clickCount = 0;
     }
     
-
-    // Update is called once per frame
     private void Update()
     {
         //Raycast를 이용하여 오브젝트와 충돌 감지
@@ -58,14 +56,14 @@ public class UiController : MonoBehaviour
         {
             RaycastHit downHit, upHit;
 
-            //클릭업된 Ray와 충돌된 오브젝트 RaycastHit 정보
-            if (Physics.Raycast(tempRay, out downHit))
+            if (Physics.Raycast(tempRay, out downHit, 200))
             {
+                //클릭업된 Ray와 충돌된 오브젝트 RaycastHit 정보
                 tempRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-                if (Physics.Raycast(tempRay, out upHit))
+                if (Physics.Raycast(tempRay, out upHit, 200))
                 {
-                    //아이콘 밖으로 클릭하고 벗어나거나 밖에서 클릭된 상태로 들어왔을 때 실행되는 것을 방지
+                    //마우스가 클릭되고 떼어진 좌표의 오브젝트가 같은 경우에만 실행
                     if (upHit.collider.gameObject.name == downHit.collider.gameObject.name)
                     {
                         int currentCanvasNum = GameManager.Instance.currentCanvasNum;
@@ -81,7 +79,6 @@ public class UiController : MonoBehaviour
                     
                 }
             }
-
 
             //For UGUI
             GameObject tempObj;
@@ -111,13 +108,13 @@ public class UiController : MonoBehaviour
         }
     }
 
-
+    //<<더블클릭 초기화>>
     private void InitDoubleClick()
     {
         clickCount = 0;
     }
 
-
+    //<<화면 전환 기능>>
     //Canvas 활설화/비활성화를 통해 화면을 전환
     //stackCanvas에 거쳐온 화면의 순서를 저장하면서 이전 화면으로 전환할 수 있도록 함
     public void ConvertCanvas(int canvasNum)
@@ -127,6 +124,9 @@ public class UiController : MonoBehaviour
         //뒤로 가기 버튼 클릭 시
         if (canvasNum < 0)
         {
+            //현재 화면을 currentStack에 임시 저장, 직전 화면을 beforeStack에 저장
+            //최상위 스택을 하나 삭제
+            //현재 화면을 비활성화 하고, 직전 화면을 활성화
             currentStack = stackCanvas[stackIndex--];
             beforeStack = stackCanvas[stackIndex];
 
@@ -140,6 +140,8 @@ public class UiController : MonoBehaviour
         }
         else
         {
+            //현재 화면을 beforeStack에 임시 저장하고 비활성화
+            //이동할 화면을 스택에 추가
             beforeStack = stackCanvas[stackIndex];
             stackCanvas[++stackIndex] = canvasNum;
 
@@ -185,15 +187,13 @@ public class UiController : MonoBehaviour
         }
     }
 
-
+    //<<팝업창 닫기>>
     public void ClosePopUp(GameObject popUp)
     {
         popUp.SetActive(false);
     }
 
-
-    //Android Native
-    //토스트 메시지 출력
+    //<<토스트 메시지 출력>>
     public static void DisplayAndroidToastMessage(string message)
     {
         if (Application.platform == RuntimePlatform.Android)

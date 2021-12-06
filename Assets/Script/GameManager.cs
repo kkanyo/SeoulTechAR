@@ -4,6 +4,7 @@ using UnityEngine.Android;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+//<<전역 스크립트>>
 public class GameManager : MonoBehaviour
 {
     #region Singleton
@@ -47,7 +48,7 @@ public class GameManager : MonoBehaviour
         databaseManager = new DatabaseManager("BuildingInfo.db");
     }
 
-    //Property
+    //<<Property>>
     public static GameManager Instance
     {
         get
@@ -60,7 +61,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    //접근 권한 허용 체크 Coroutine
+    //<<접근 권한 허용 체크 Coroutine>>
     IEnumerator PermissionCheckCoroutine()
     {
         var waitFrame = new WaitForEndOfFrame();
@@ -95,7 +96,7 @@ public class GameManager : MonoBehaviour
         }
     }
         
-    //Fade Effect Coroutine
+    //<<FadeOut Effect Coroutine>>
     IEnumerator FadeCoroutine()
     {
         var wait = new WaitForSeconds(0.01f);
@@ -115,7 +116,7 @@ public class GameManager : MonoBehaviour
         yield break;
     }
 
-    //Scene 이동
+    //<<Scene 이동>>
     private void MoveScene(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
